@@ -5,6 +5,12 @@
 echo "Welcome to bash script."
 echo
 
+# Displaying system information
+echo "###################"
+echo "System Information:"
+lsb_release -a
+echo
+
 # Displaying system uptime
 echo "###################"
 echo "System Uptime:"
