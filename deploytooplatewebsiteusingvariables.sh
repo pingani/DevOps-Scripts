@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Declaring Variables
-URL="https://www.tooplate.com/zip-templates/2134_gotto_job.zip"
-FILE_NAME="2134_gotto_job"
-FILE_TYPE=".zip"
+URL="https://www.tooplate.com/zip-templates/2137_barista_cafe.zip"
+FILE_NAME="2137_barista_cafe"
+FILE_TYPE="zip"
 TEMP_DIR="/tmp/websitefiles"
 APACHE_DOC_ROOT="/var/www/html/"
 
@@ -12,8 +12,8 @@ echo "########################################"
 echo "Installing wget and unzip..."
 echo "########################################"
 echo
-sudo apt-get update
-sudo apt-get install -y wget unzip
+sudo apt-get update > /dev/null
+sudo apt-get install -y wget unzip > /dev/null
 echo
 
 # Install apache2 and start and enable
@@ -21,7 +21,7 @@ echo "########################################"
 echo "Installing and starting apache2..."
 echo "########################################"
 echo
-sudo apt-get install -y apache2
+sudo apt-get install -y apache2 > /dev/null
 sudo systemctl start apache2
 sudo systemctl enable apache2
 echo
@@ -31,10 +31,10 @@ echo "########################################"
 echo "Creating temporary directory and downloading website files..."
 echo "########################################"
 echo
-mkdir -p /tmp/websitefiles
-cd /tmp/websitefiles
-wget https://www.tooplate.com/zip-templates/2135_mini_finance.zip
-unzip 2135_mini_finance.zip
+mkdir -p $TEMP_DIR
+cd $TEMP_DIR
+wget $URL
+unzip $FILE_NAME.$FILE_TYPE > /dev/null
 echo
 
 # Copying files to Apache's document root
@@ -42,7 +42,7 @@ echo "########################################"
 echo "Copying files to Apache's document root..."
 echo "########################################"
 echo
-sudo cp -r 2135_mini_finance/* /var/www/html/
+sudo cp -r $FILE_NAME/* $APACHE_DOC_ROOT > /dev/null
 echo
 
 # Restart apache service
@@ -58,7 +58,7 @@ echo "########################################"
 echo "Cleaning up temporary files..."
 echo "########################################"
 echo
-rm -rf /tmp/websitefiles
+rm -rf $TEMP_DIR
 echo
 
 echo "########################################"
