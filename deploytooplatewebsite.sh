@@ -55,6 +55,6 @@ rm -rf /tmp/websitefiles
 echo
 
 echo "########################################"
-echo "Deployed completed successfully."
+echo "Deployment completed successfully."
 echo "########################################"
 echo
