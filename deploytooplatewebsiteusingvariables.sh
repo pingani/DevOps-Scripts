@@ -2,8 +2,10 @@
 
 # Declaring Variables
 URL="https://www.tooplate.com/zip-templates/2134_gotto_job.zip"
-FILE_Name="2134_gotto_job"
+FILE_NAME="2134_gotto_job"
+FILE_TYPE=".zip"
 TEMP_DIR="/tmp/websitefiles"
+APACHE_DOC_ROOT="/var/www/html/"
 
 # Install wget and unzip if not already installed
 echo "########################################"
