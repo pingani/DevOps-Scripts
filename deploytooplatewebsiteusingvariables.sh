@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Declaring Variables
+URL="https://www.tooplate.com/zip-templates/2134_gotto_job.zip"
+FILE_Name="2134_gotto_job"
+TEMP_DIR="/tmp/websitefiles"
+
 # Install wget and unzip if not already installed
 echo "########################################"
 echo "Installing wget and unzip..."
