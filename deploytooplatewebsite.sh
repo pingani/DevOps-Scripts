@@ -9,9 +9,9 @@ sudo apt-get update
 sudo apt-get install -y wget unzip
 echo
 
-# Install apache and start and enable
+# Install apache2 and start and enable
 echo "########################################"
-echo "Installing and starting httpd..."
+echo "Installing and starting apache2..."
 echo "########################################"
 echo
 sudo apt-get install -y apache2
@@ -40,7 +40,7 @@ echo
 
 # Restart apache service
 echo "########################################"
-echo "Restarting httpd service..."
+echo "Restarting apache2 service..."
 echo "########################################"
 echo
 sudo systemctl restart apache2
