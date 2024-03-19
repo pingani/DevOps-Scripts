@@ -22,7 +22,8 @@ EOT
 
 # Update and install JDK
 sudo apt-get update -y
-sudo apt-get install openjdk-11-jdk -y
+#sudo apt-get install openjdk-11-jdk -y
+sudo apt-get install openjdk-17-jdk -y
 sudo update-alternatives --config java
 
 # Check Java version
@@ -35,8 +36,9 @@ sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`
 
 # Install PostgreSQL and start the service
 sudo apt install postgresql postgresql-contrib -y
+#sudo -u postgres psql -c "SELECT version();"
 sudo systemctl enable postgresql.service
-sudo systemctl start postgresql.service
+sudo systemctl start  postgresql.service
 
 # Set PostgreSQL password for 'postgres' user
 sudo echo "postgres:admin123" | chpasswd
@@ -46,28 +48,31 @@ runuser -l postgres -c "createuser sonar"
 sudo -i -u postgres psql -c "ALTER USER sonar WITH ENCRYPTED PASSWORD 'admin123';"
 sudo -i -u postgres psql -c "CREATE DATABASE sonarqube OWNER sonar;"
 sudo -i -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE sonarqube to sonar;"
+systemctl restart  postgresql
 
 # Restart PostgreSQL service
-systemctl restart postgresql
-
-# Check PostgreSQL status
+#systemctl status -l   postgresql
+sudo apt install net-tools
 netstat -tulpena | grep postgres
 
 # Download and install SonarQube
 sudo mkdir -p /sonarqube/
 cd /sonarqube/
-sudo curl -O https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.3.0.34182.zip
+# SonarQube Java 19 compatible version above V9
+sudo curl -O https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.4.87374.zip
 sudo apt-get install zip -y
-sudo unzip -o sonarqube-8.3.0.34182.zip -d /opt/
-sudo mv /opt/sonarqube-8.3.0.34182/ /opt/sonarqube
+sudo unzip -o sonarqube-9.9.4.87374.zip -d /opt/
+
+# SonarQube Java 11 compatible version upto V8  https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.3.0.34182.zip
+sudo mv /opt/sonarqube-9.9.4.87374/ /opt/sonarqube
 
 # Create SonarQube group and user
 sudo groupadd sonar
 sudo useradd -c "SonarQube - User" -d /opt/sonarqube/ -g sonar sonar
 sudo chown sonar:sonar /opt/sonarqube/ -R
+cp /opt/sonarqube/conf/sonar.properties /root/sonar.properties_backup
 
 # Configure SonarQube properties
-cp /opt/sonarqube/conf/sonar.properties /root/sonar.properties_backup
 cat <<EOT> /opt/sonarqube/conf/sonar.properties
 sonar.jdbc.username=sonar
 sonar.jdbc.password=admin123
@@ -80,6 +85,7 @@ sonar.log.level=INFO
 sonar.path.logs=logs
 EOT
 
+
 # Configure SonarQube service
 cat <<EOT> /etc/systemd/system/sonarqube.service
 [Unit]
@@ -88,39 +94,49 @@ After=syslog.target network.target
 
 [Service]
 Type=forking
+
 ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
 ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+
 User=sonar
 Group=sonar
 Restart=always
+
 LimitNOFILE=65536
 LimitNPROC=4096
+
 
 [Install]
 WantedBy=multi-user.target
 EOT
 
+
 # Reload systemd and enable SonarQube service
 systemctl daemon-reload
 systemctl enable sonarqube.service
+#systemctl start sonarqube.service
+#systemctl status -l sonarqube.service
 
 # Install Nginx and configure SonarQube proxy
-apt-get install nginx -y
+sudo apt-get install nginx -y
 rm -rf /etc/nginx/sites-enabled/default
 rm -rf /etc/nginx/sites-available/default
-
 cat <<EOT> /etc/nginx/sites-available/sonarqube
-server {
+server{
     listen      80;
     server_name sonarqube.groophy.in;
+
     access_log  /var/log/nginx/sonar.access.log;
     error_log   /var/log/nginx/sonar.error.log;
+
     proxy_buffers 16 64k;
     proxy_buffer_size 128k;
+
     location / {
         proxy_pass  http://127.0.0.1:9000;
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
         proxy_redirect off;
+              
         proxy_set_header    Host            \$host;
         proxy_set_header    X-Real-IP       \$remote_addr;
         proxy_set_header    X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -132,6 +148,7 @@ EOT
 # Enable Nginx and create symbolic link for SonarQube site
 ln -s /etc/nginx/sites-available/sonarqube /etc/nginx/sites-enabled/sonarqube
 systemctl enable nginx.service
+#systemctl restart nginx.service
 
 # Open ports in firewall
 sudo ufw allow 80,9000,9001/tcp
