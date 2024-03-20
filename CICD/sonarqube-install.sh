@@ -48,10 +48,12 @@ runuser -l postgres -c "createuser sonar"
 sudo -i -u postgres psql -c "ALTER USER sonar WITH ENCRYPTED PASSWORD 'admin123';"
 sudo -i -u postgres psql -c "CREATE DATABASE sonarqube OWNER sonar;"
 sudo -i -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE sonarqube to sonar;"
-systemctl restart  postgresql
 
 # Restart PostgreSQL service
+systemctl restart  postgresql
 #systemctl status -l   postgresql
+
+# Install net-tools
 sudo apt install net-tools
 netstat -tulpena | grep postgres
 
