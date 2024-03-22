@@ -8,7 +8,7 @@ pipeline {
 
 	stages {
 	    stage('Fetch code') {
-			// Fetch code from VCM (GitHub)
+			// Fetch code from VCS (GitHub)
             steps {
                git branch: 'main', url: 'https://github.com/adigopulabharath/vprofile-project.git'
             }
