@@ -6,9 +6,9 @@ cp /etc/sysctl.conf /root/sysctl.conf_backup
 # Configure sysctl.conf with desired settings
 cat <<EOT> /etc/sysctl.conf
 vm.max_map_count=262144
-fs.file-max=65536
-ulimit -n 65536
-ulimit -u 4096
+fs.file-max=131072
+ulimit -n 131072
+ulimit -u 8192
 EOT
 
 # Backup limits.conf file
@@ -16,13 +16,12 @@ cp /etc/security/limits.conf /root/sec_limit.conf_backup
 
 # Configure limits.conf for SonarQube
 cat <<EOT> /etc/security/limits.conf
-sonarqube   -   nofile   65536
-sonarqube   -   nproc    409
+sonarqube   -   nofile   131072
+sonarqube   -   nproc    8192
 EOT
 
 # Update and install JDK
 sudo apt-get update -y
-#sudo apt-get install openjdk-11-jdk -y
 sudo apt-get install openjdk-17-jdk -y
 sudo update-alternatives --config java
 
